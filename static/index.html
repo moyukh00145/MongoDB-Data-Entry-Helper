@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script src="jquery.base64.js"></script>
+</head>
+
+<body>
+
+
+    <div class="first">
+        Type your Mongodb Application Url :
+        <input type="text" name="" id="url" width="200px">
+
+    </div>
+
+    <div class="second">
+        Number of object in a Model
+        <input type="number" name="" id="div_num">
+        <button type="submit" id="create_field">Create Field</button>
+        <div id="obj_input">
+
+        </div>
+    </div>
+
+
+
+    <div class="third">
+
+        <div id="input_area">
+
+            <!-- <input type="file" name="Text" id="file_sub1"> -->
+
+        </div>
+
+
+        <button type="submit" id="btn">Submit</button>
+    </div>
+
+    <button id="prev">Prev</button>
+    <button id="next">Next</button>
+
+
+
+
+    <script>
+
+        var frag_count = 1
+        var schema = {}
+        var all_files = {}
+        var dc_count = 0
+        var field_created = false
+
+        $('.first').show()
+        $('.second').hide()
+        $('.third').hide()
+        $(document).ready(function () {
+
+            $('#create_field').click(function () {
+
+                field_created = true
+
+                $('#obj_input').empty()
+
+                var num = $('#div_num').val()
+                $('#obj_input').append(jQuery('<p>Enter the keys Of one Json object</p>'));
+                $('#obj_input').append(jQuery('<div>Table_Name<input type="text" name="" id="table_name"></div>'));
+
+                for (i = 0; i < num; i++) {
+                    // console.log('input')
+                    var id = "obj" + i;
+                    var input_schema = jQuery('<div>key' + i + '<input type="text" name="" id="' + id + '"></div>')
+                    $('#obj_input').append(input_schema);
+
+                }
+
+            })
+
+            var bo = false
+
+            $('#btn').click(function () {
+                // console.log("working")
+                var schema_ch = schema[1]
+                var nc_count = 0
+                for (var key in schema_ch) {
+                    var nf = '#file_sub' + nc_count;
+                    var files = $(nf)[0].files[0]
+                    nc_count++
+
+                    retreveText(files, key)
+
+                    //     var fileReader = new FileReader()
+                    //     fileReader.addEventListener('load', function (e) {
+
+                    //         var lc_key=schema[key]
+
+                    //         var text = e.target.result
+
+                    //         var arr = text.toString().replace(/\r\n/g, '\n').split('\n')
+
+                    //         var f_ar=[]
+
+                    //         arr.forEach(element=>{
+                    //             if(element!=''){
+                    //                 f_ar.push(element)
+                    //             }
+                    //         })
+
+                    //        console.log(f_ar)
+                    //        console.log(lc_key)
+                    //         // callBack_addElement(f_ar,key)
+                    //     })
+                    //     fileReader.readAsText(files)
+                }
+
+                // var files = $('#file_sub1')[0].files[0]
+                // var fileReader = new FileReader()
+                //     fileReader.addEventListener('load', function (e) {
+                //         var lc_key=schema[key]
+                //         var text = e.target.result;
+                //         var arr = text.toString().replace(/\r\n/g, '\n').split('\n');
+                //         console.log(arr)
+                //         var f_ar=[]
+                //         arr.forEach(element=>{
+                //             if(element!=''){
+                //                 f_ar.push(element)
+                //             }
+                //         })
+                //         all_files[lc_key]=f_ar
+                //     })
+                //     fileReader.readAsText(files)
+
+
+            })
+
+            function retreveText(files, key) {
+
+
+                var fileReader = new FileReader()
+                fileReader.addEventListener('load', function (e) {
+
+                    var lc_key = schema[1][key]
+
+                    var text = e.target.result
+
+                    var arr = text.toString().replace(/\r\n/g, '\n').split('\n')
+
+                    var f_ar = []
+
+                    arr.forEach(element => {
+                        if (element != '') {
+                            f_ar.push(element)
+                        }
+                    })
+                    callBack_addElement(f_ar, lc_key)
+                })
+                fileReader.readAsText(files)
+
+
+            }
+
+            $("#next").click(function () {
+
+
+                if (check_page(frag_count)) {
+
+                    frag_count++
+                    visiblity(frag_count)
+
+                }
+
+
+            })
+            $("#prev").click(function () {
+                frag_count--
+
+                console.log(frag_count)
+
+                visiblity(frag_count)
+
+            })
+
+
+            function callBack_addElement(arr, key) {
+
+
+                all_files[key] = arr
+                if (Object.keys(all_files).length == Object.keys(schema[1]).length) {
+                    // console.log(all_files)
+                    make_Json(all_files)
+                }
+
+
+            }
+
+
+            function fun_click() {
+                frag_count++
+                visiblity(frag_count)
+
+            }
+
+            function visiblity(param) {
+
+
+                switch (param) {
+
+                    case 1: {
+                        $('.first').show()
+                        $('.second').hide()
+                        $('.third').hide()
+
+                    }
+                        break;
+                    case 2:
+                        {
+                            $('.first').hide()
+                            $('.second').show()
+                            $('.third').hide()
+                        }
+
+                        break;
+                    case 3: {
+                        $('.first').hide()
+                        $('.second').hide()
+
+                        var lc_count = 0
+                        var schema_child = schema[1]
+                        for (var key in schema_child) {
+                            var in_ele = jQuery('<div>Add txt file for (key=' + schema_child[key] + ') <input type="file" name="Text" id="file_sub' + lc_count + '">')
+
+                            $('#input_area').append(in_ele)
+                            lc_count++
+                            // console.log(lc_count)
+
+                        }
+                        $('.third').show()
+                    }
+
+                        break;
+                    case 4:
+
+                        break;
+                    case 5:
+
+                        break;
+
+                    default: {
+                        $('.first').show()
+                        $('.second').hide()
+
+                    }
+                        break;
+                }
+
+
+            }
+
+            function make_Json(arr) {
+
+                var obj = {}
+                var count = Object.keys(arr).length
+                var ob_keys = Object.keys(arr)
+                var element_size = Number.MAX_SAFE_INTEGER
+
+                for (i = 0; i < count; i++) {
+
+                    var count_v = arr[ob_keys[i]].length
+                    // console.log(ob_keys[i])
+                    if (element_size > count_v) {
+                        element_size = count_v
+                    }
+                }
+
+
+                for (i = 0; i < element_size; i++) {
+                    var str = {}
+                    for (j = 0; j < count; j++) {
+                        str[ob_keys[j]] = arr[ob_keys[j]][i]
+                    }
+                    obj[i] = str
+                }
+
+                // console.log(obj)
+
+
+
+                // arr.forEach(element => {
+
+                //     var str = {}
+                //     // str['question'] = element;
+                //     // str['ans'] = "wait";\
+
+                //     for (var key in schema) {
+                //         str[schema[key]] = "wait " + count
+                //     }
+                //     obj[count] = str;
+                //     count++
+
+                // });
+
+
+
+
+                var js = JSON.stringify(obj)
+                $.ajax({
+
+                    url: "/add",
+                    type: "POST",
+                    data: js,
+                    contentType: "application/json",
+                    success: function (success) {
+                        console.log(success)
+                    }
+
+                })
+            }
+
+            function check_null(count) {
+
+                var t_name = $('#table_name').val()
+                if (t_name == '') {
+                    return false;
+                }
+                else {
+                    for (i = 0; i < count; i++) {
+                        var id = "#obj" + i;
+                        var tem = $(id).val()
+                        if (tem == '') {
+                            return false
+                            break
+                        }
+
+                    }
+                }
+
+                return true
+            }
+
+            function check_page(count) {
+                if (count == 1) {
+                    var url = $('#url').val()
+                    if (url == '') {
+                        alert("MongoDB url can not be Null")
+                        return false
+                    }
+                    else {
+
+                        if (send_MongoDB_Connection(url)) {
+                            return true
+                        }
+                        else {
+                            return false
+                        }
+
+
+                    }
+
+                }
+                else if (count == 2) {
+
+                    var num = $('#div_num').val()
+
+                    if (num == '') {
+                        alert("Object must have atleast one key")
+                        return false
+                    }
+                    else {
+                        if (field_created) {
+                            if (check_null(num)) {
+
+                                dc_count = num
+                                make_schema(num)
+
+                                return true
+
+                            }
+                            else {
+                                alert("Object key cannot be Null")
+                                return false
+                            }
+                        }
+                        else {
+
+                            alert("Create the fields for json object")
+                            return false
+
+                        }
+
+                    }
+                }
+                else if (count == 3) {
+
+
+
+                    return true
+
+                }
+            }
+
+            function send_MongoDB_Connection(url_mnd) {
+
+                // console.log(url_mnd)
+
+                var ob = {
+                    url_md: url_mnd
+                }
+
+                var en_url = $.base64.encode(url_mnd)
+
+                $.ajax({
+
+                    url: "/connection",
+                    type: "GET",
+                    data: en_url,
+                    contentType: "text/plain",
+                    success: function (success) {
+                        // console.log(success)
+                        fun_click()
+                        return true
+                    },
+                    error: function (jqXHR, exception) {
+                        var msg = '';
+                        if (jqXHR.status === 0) {
+                            msg = 'Not connect.\n Verify Network.';
+                        } else if (jqXHR.status == 404) {
+                            msg = 'Requested page not found. [404]';
+                        } else if (jqXHR.status == 500) {
+                            msg = 'Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = 'Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = 'Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = 'Ajax request aborted.';
+                        } else {
+                            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                        }
+
+
+
+                        alert(jqXHR.responseText)
+
+                        // console.log(exception)
+                        // console.log(msg)
+
+                        return false
+                    }
+
+                })
+
+            }
+
+            function make_schema(count) {
+
+
+
+                // for (i = 0; i < count; i++) {
+                //     var id = "#obj" + i;
+                //     var tem = $(id).val()
+                //     schema[i] = tem
+
+                // }
+
+                var k_ob = {}
+                var t_name = $('#table_name').val()
+
+                for (i = 0; i < count; i++) {
+                    var id = "#obj" + i;
+                    var tem = $(id).val()
+                    k_ob[i] = tem
+
+                }
+                schema[0] = t_name
+                schema[1] = k_ob
+
+                $.ajax({
+
+                    url: "/schema",
+                    type: "GET",
+                    data: JSON.stringify(schema),
+                    contentType: "application/json",
+                    success: function (success) {
+                        console.log(success)
+                    },
+                    error: function (jqXHR, exception) {
+                        var msg = '';
+                        if (jqXHR.status === 0) {
+                            msg = 'Not connect.\n Verify Network.';
+                        } else if (jqXHR.status == 404) {
+                            msg = 'Requested page not found. [404]';
+                        } else if (jqXHR.status == 500) {
+                            msg = 'Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = 'Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = 'Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = 'Ajax request aborted.';
+                        } else {
+                            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                        }
+
+                        // console.log(msg)
+                    }
+
+                })
+
+            }
+        })
+
+
+
+    </script>
+</body>
+
+</html>
